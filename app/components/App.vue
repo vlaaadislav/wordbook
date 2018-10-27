@@ -1,18 +1,33 @@
 <template>
     <Page>
-        <ActionBar title="Welcome to NativeScript-Vue!"/>
-        <GridLayout colums="*" rows="*">
-            <Label class="message" :text="msg" col="0" row="0"/>
-        </GridLayout>
+        <ActionBar title="Wordbook"/>
+
+        <TabView>
+            <TabViewItem title="Список слов">
+                <Label text="Content for Tab 1" />
+            </TabViewItem>
+
+            <TabViewItem title="Новое слово">
+                <StackLayout>
+                    <TextField v-model="newWord" hint="Введите новое слово"/>
+                </StackLayout>
+            </TabViewItem>
+        </TabView>
     </Page>
 </template>
 
 <script>
     export default {
+        name: 'App',
+
         data() {
             return {
-                msg: 'Hello World!'
+                newWord: ''
             }
+        },
+
+        methods: {
+
         }
     }
 </script>
