@@ -1,33 +1,56 @@
 <template>
     <Page>
-        <ActionBar title="Wordbook"/>
+        <ActionBar title="Wordbook">
+            <ActionItem
+                text="Добавить"
+                android.position="popup"
+                @tap="addWord"
+            />
+        </ActionBar>
 
-        <TabView>
-            <TabViewItem title="Список слов">
-                <Label text="Content for Tab 1" />
-            </TabViewItem>
+        <ActivityIndicator
+            v-if="loading"
+            busy
+            width="100"
+            height="100"
+        />
 
-            <TabViewItem title="Новое слово">
-                <StackLayout>
-                    <TextField v-model="newWord" hint="Введите новое слово"/>
-                </StackLayout>
-            </TabViewItem>
-        </TabView>
+        <template v-else>
+            <ListView for="word in store.all">
+                <v-template>
+                    <FlexboxLayout justifyContent="space-between">
+                        <Label :text="word.word"/>
+                        <Label :text="word.translation"/>
+                    </FlexboxLayout>
+                </v-template>
+            </ListView>
+        </template>
     </Page>
 </template>
 
 <script>
+    import Store from '../store'
+
     export default {
         name: 'App',
 
         data() {
             return {
-                newWord: ''
+                loading: false,
+                store: new Store()
+            }
+        },
+
+        computed: {
+            loading() {
+                return this.store.initialized
             }
         },
 
         methods: {
+            addWord() {
 
+            }
         }
     }
 </script>
