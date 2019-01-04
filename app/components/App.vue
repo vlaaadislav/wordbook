@@ -29,48 +29,60 @@
             height="100"
         />
 
-        <StackLayout v-else>
-            <RadListView ref="list" for="word in store.data" swipeActions="true" @itemSwipeProgressStarted="swipe">
-                <v-template>
-                    <FlexboxLayout class="list-item" justifyContent="space-between" alignItems="center">
-                        <Label :text="word.source"/>
-                        <Label :text="showTranslation ? word.translation : ''"/>
-                    </FlexboxLayout>
-                </v-template>
+        <DockLayout v-else>
+            <FlexboxLayout dock="bottom" height="40" justifyContent="center" alignItems="center">
+                <Pagination v-model="page" :total="store.data.length" :perPage="perPage"/>
+            </FlexboxLayout>
 
-                <v-template name="itemswipe">
-                    <FlexboxLayout class="swipe-items" justifyContent="flex-end">
-                        <Button id="delete-button" text="Удалить" ~alignSelf="center" @tap="deleteWord"/>
-                    </FlexboxLayout>
-                </v-template>
-            </RadListView>
-        </StackLayout>
+            <StackLayout>
+                <RadListView ref="list" for="word in items" swipeActions="true" @itemSwipeProgressStarted="swipe">
+                    <v-template>
+                        <FlexboxLayout class="list-item" justifyContent="space-between" alignItems="center">
+                            <Label :text="word.source"/>
+                            <Label :text="showTranslation ? word.translation : ''"/>
+                        </FlexboxLayout>
+                    </v-template>
+
+                    <v-template name="itemswipe">
+                        <FlexboxLayout class="swipe-items" justifyContent="flex-end">
+                            <Button id="delete-button" text="Удалить" ~alignSelf="center" @tap="deleteWord"/>
+                        </FlexboxLayout>
+                    </v-template>
+                </RadListView>
+            </StackLayout>
+        </DockLayout>
     </Page>
 </template>
 
 <script>
     import Store from '../store/index'
     import TranslationService from '../services/translation'
-    import DeleteIcon from 'vue-material-design-icons/Delete'
+    import Pagination from './Pagination'
 
     export default {
         name: 'App',
 
         components: {
-            DeleteIcon
+            Pagination
         },
 
         data() {
             return {
                 store: new Store(),
                 translate: new TranslationService(),
-                showTranslation: false
+                showTranslation: false,
+                page: 1,
+                perPage: 10
             }
         },
 
         computed: {
             loading() {
                 return !this.store.initialized || this.translate.loading
+            },
+
+            items() {
+                return this.store.data.slice((this.page - 1) * this.perPage, this.page * this.perPage)
             }
         },
 
@@ -126,6 +138,11 @@
                 const swipeLimits = data.swipeLimits
                 swipeLimits.right = object.getViewById('delete-button').getMeasuredWidth()
                 swipeLimits.threshold = object.getViewById('delete-button').getMeasuredWidth() / 2
+            },
+
+            changePage(event) {
+                const isNext = event.direction === 1
+                console.log(isNext)
             }
         }
     }
