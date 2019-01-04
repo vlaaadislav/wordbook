@@ -4,7 +4,7 @@ export default class Store {
     constructor() {
         this.initialized = false
         this.path = path.join(knownFolders.documents().path, 'wordbook.json')
-        this.data = []
+        this.data = Array.from({ length: 100 }, (_, index) => ({ source: 'Translation' + index, translation: 'Перевод' }))
         this.init()
     }
 
@@ -32,6 +32,12 @@ export default class Store {
         }
 
         this.data.push(item)
+
+        return this.update()
+    }
+
+    delete(item) {
+        this.data.splice(this.data.indexOf(item), 1)
 
         return this.update()
     }
