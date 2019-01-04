@@ -1,5 +1,5 @@
 <template>
-    <FlexboxLayout orientation="horizontal" alignItems="center">
+    <FlexboxLayout v-if="pages" orientation="horizontal" alignItems="center">
         <Button v-if="value !== 1" text="Prev" @tap="$emit('input', value - 1)"/>
 
         <Label :text="`${value} из ${pages}`" color="black"/>
