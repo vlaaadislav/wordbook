@@ -30,26 +30,39 @@
 
 <script>
     import Store from '../store'
+    import TranslationService from '../services/translation'
 
     export default {
         name: 'App',
 
         data() {
             return {
-                loading: false,
-                store: new Store()
+                store: new Store(),
+                translate: new TranslationService()
             }
         },
 
         computed: {
             loading() {
-                return this.store.initialized
+                return this.store.initialized || this.translate.loading
             }
         },
 
         methods: {
-            addWord() {
+            async addWord() {
+                const result = await prompt({
+                    title: 'Добавление нового слова',
+                    okButtonText: "OK",
+                    cancelButtonText: "Отменить"
+                })
 
+                const text = result.text.trim()
+
+                if (!result.result || !text) {
+                    return
+                }
+
+                await this.translate.fetch(text)
             }
         }
     }
@@ -59,12 +72,5 @@
     ActionBar {
         background-color: #53ba82;
         color: #ffffff;
-    }
-
-    .message {
-        vertical-align: center;
-        text-align: center;
-        font-size: 20;
-        color: #333333;
     }
 </style>
