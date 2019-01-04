@@ -2,6 +2,20 @@
     <Page>
         <ActionBar title="Wordbook">
             <ActionItem
+                v-show="!showTranslation"
+                text="Показать перевод"
+                android.position="popup"
+                @tap="showTranslation = !showTranslation"
+            />
+
+            <ActionItem
+                v-show="showTranslation"
+                text="Скрыть перевод"
+                android.position="popup"
+                @tap="showTranslation = !showTranslation"
+            />
+
+            <ActionItem
                 text="Добавить"
                 android.position="popup"
                 @tap="addWord"
@@ -20,7 +34,7 @@
                 <v-template>
                     <FlexboxLayout class="list-item" justifyContent="space-between" alignItems="center">
                         <Label :text="word.source"/>
-                        <Label :text="word.translation"/>
+                        <Label :text="showTranslation ? word.translation : ''"/>
                     </FlexboxLayout>
                 </v-template>
 
@@ -49,13 +63,20 @@
         data() {
             return {
                 store: new Store(),
-                translate: new TranslationService()
+                translate: new TranslationService(),
+                showTranslation: false
             }
         },
 
         computed: {
             loading() {
                 return !this.store.initialized || this.translate.loading
+            }
+        },
+
+        watch: {
+            showTranslation() {
+                this.$refs.list.refresh()
             }
         },
 
