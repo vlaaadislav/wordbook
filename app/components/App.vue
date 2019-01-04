@@ -16,10 +16,10 @@
         />
 
         <template v-else>
-            <ListView for="word in store.all">
+            <ListView for="word in store.data" rowHeight="40">
                 <v-template>
-                    <FlexboxLayout justifyContent="space-between">
-                        <Label :text="word.word"/>
+                    <FlexboxLayout class="list-item" justifyContent="space-between" alignItems="center">
+                        <Label :text="word.source"/>
                         <Label :text="word.translation"/>
                     </FlexboxLayout>
                 </v-template>
@@ -29,7 +29,7 @@
 </template>
 
 <script>
-    import Store from '../store'
+    import Store from '../store/index'
     import TranslationService from '../services/translation'
 
     export default {
@@ -44,7 +44,7 @@
 
         computed: {
             loading() {
-                return this.store.initialized || this.translate.loading
+                return !this.store.initialized || this.translate.loading
             }
         },
 
@@ -59,10 +59,16 @@
                 const text = result.text.trim()
 
                 if (!result.result || !text) {
-                    return
+                    return alert('Введите слово')
                 }
 
-                await this.translate.fetch(text)
+                const item = await this.translate.fetch(text)
+
+                if (this.store.wordsSet.has(item.source)) {
+                    return alert('Такое слово уже есть')
+                }
+
+                this.store.push(item)
             }
         }
     }
@@ -72,5 +78,9 @@
     ActionBar {
         background-color: #53ba82;
         color: #ffffff;
+    }
+
+    .list-item {
+        padding: 0 10;
     }
 </style>
