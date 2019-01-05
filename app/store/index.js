@@ -1,9 +1,8 @@
-import { knownFolders, path, File } from 'tns-core-modules/file-system'
+import * as AppSettings from 'tns-core-modules/application-settings'
 
 export default class Store {
     constructor() {
         this.initialized = false
-        this.path = path.join(knownFolders.documents().path, 'wordbook.json')
         this.data = []
         this.init()
     }
@@ -12,18 +11,18 @@ export default class Store {
         return new Set(this.data.map(item => item.source))
     }
 
-    async init() {
-        if (File.exists(this.path)) {
-            await this.update()
+    init() {
+        if (!AppSettings.hasKey('data')) {
+            this.update()
         } else {
-            this.data = JSON.parse(await File.fromPath(this.path).readText())
+            this.data = JSON.parse(AppSettings.getString('data'))
         }
 
         this.initialized = true
     }
 
     update() {
-        return File.fromPath(this.path).writeText(JSON.stringify(this.data))
+        return AppSettings.setString('data', JSON.stringify(this.data))
     }
 
     push(item) {

@@ -2,6 +2,12 @@
     <Page>
         <ActionBar title="Wordbook">
             <ActionItem
+                text="Добавить"
+                android.position="popup"
+                @tap="addWord"
+            />
+
+            <ActionItem
                 v-show="!showTranslation"
                 text="Показать перевод"
                 android.position="popup"
@@ -13,12 +19,6 @@
                 text="Скрыть перевод"
                 android.position="popup"
                 @tap="showTranslation = !showTranslation"
-            />
-
-            <ActionItem
-                text="Добавить"
-                android.position="popup"
-                @tap="addWord"
             />
         </ActionBar>
 
