@@ -72,13 +72,13 @@
                 translate: new TranslationService(),
                 showTranslation: false,
                 page: 1,
-                perPage: 10
+                perPage: 15
             }
         },
 
         computed: {
             loading() {
-                return !this.store.initialized || this.translate.loading
+                return !this.store.initialized || this.wordLoading
             },
 
             items() {
@@ -113,6 +113,8 @@
                 }
 
                 this.store.push(item)
+
+                this.$refs.list.refresh()
             },
 
             async deleteWord({ object }) {
