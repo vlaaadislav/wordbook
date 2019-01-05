@@ -25,19 +25,20 @@ export default class TranslationService {
     static formatResponse(data) {
         const source = data[0][0][1]
         const translation = data[0][0][0]
-        const other = data[1].map(words => ({
-            class: words[0],
-            words: words[1]
-        }))
-        const definitions = data[12].map(words => ({
+        const options = (data[1] || []).reduce((acc, item) => (acc.push(...item[1]), acc), [])
+        const definitions = (data[12] || []).map(words => ({
             class: words[0],
             definitions: words[1].map(definition => definition[0])
         }))
 
+        if (!options.includes(translation)) {
+            options.unshift(translation)
+        }
+
         return {
             source: source.slice(0, 1).toUpperCase() + source.slice(1),
             translation,
-            other,
+            options,
             definitions
         }
     }

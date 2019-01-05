@@ -22,34 +22,40 @@
             />
         </ActionBar>
 
-        <ActivityIndicator
-            v-if="loading"
-            busy
-            width="100"
-            height="100"
-        />
-
-        <DockLayout v-else>
+        <DockLayout>
             <FlexboxLayout dock="bottom" height="40" justifyContent="center" alignItems="center">
                 <Pagination v-model="page" :total="store.data.length" :perPage="perPage"/>
             </FlexboxLayout>
 
-            <StackLayout>
-                <RadListView ref="list" for="word in items" swipeActions="true" @itemSwipeProgressStarted="swipe">
-                    <v-template>
-                        <FlexboxLayout class="list-item" justifyContent="space-between" alignItems="center">
-                            <Label :text="word.source"/>
-                            <Label :text="showTranslation ? word.translation : ''"/>
-                        </FlexboxLayout>
-                    </v-template>
+            <GridLayout>
+                <StackLayout>
+                    <RadListView
+                        v-show="!loading"
+                        ref="list"
+                        for="word in items"
+                        swipeActions="true"
+                        @itemSwipeProgressStarted="swipe"
+                        @itemTap="changeTranslation"
+                    >
+                        <v-template>
+                            <FlexboxLayout class="list-item" justifyContent="space-between" alignItems="center">
+                                <Label :text="word.source"/>
+                                <Label :text="showTranslation ? word.translation : ''"/>
+                            </FlexboxLayout>
+                        </v-template>
 
-                    <v-template name="itemswipe">
-                        <FlexboxLayout class="swipe-items" justifyContent="flex-end">
-                            <Button id="delete-button" text="Удалить" ~alignSelf="center" @tap="deleteWord"/>
-                        </FlexboxLayout>
-                    </v-template>
-                </RadListView>
-            </StackLayout>
+                        <v-template name="itemswipe">
+                            <FlexboxLayout class="swipe-items" justifyContent="flex-end">
+                                <Button id="delete-button" text="Удалить" ~alignSelf="center" @tap="deleteWord"/>
+                            </FlexboxLayout>
+                        </v-template>
+                    </RadListView>
+                </StackLayout>
+
+                <GridLayout rows="*" :visibility="loading ? 'visible' : 'collapsed'">
+                    <ActivityIndicator busy="true" width="100" height="100"/>
+                </GridLayout>
+            </GridLayout>
         </DockLayout>
     </Page>
 </template>
@@ -70,7 +76,7 @@
             return {
                 store: new Store(),
                 translate: new TranslationService(),
-                showTranslation: false,
+                showTranslation: true,
                 page: 1,
                 perPage: 15
             }
@@ -78,7 +84,7 @@
 
         computed: {
             loading() {
-                return !this.store.initialized || this.wordLoading
+                return !this.store.initialized || this.translate.loading
             },
 
             items() {
@@ -114,7 +120,7 @@
 
                 this.store.push(item)
 
-                this.$refs.list.refresh()
+                this.$nextTick(() => this.$refs.list.refresh)
             },
 
             async deleteWord({ object }) {
@@ -142,9 +148,14 @@
                 swipeLimits.threshold = object.getViewById('delete-button').getMeasuredWidth() / 2
             },
 
-            changePage(event) {
-                const isNext = event.direction === 1
-                console.log(isNext)
+            async changeTranslation({ item }) {
+                const translation = await action('Варианты перевода', 'Отмена', item.options)
+
+                if (item.options.includes(translation)) {
+                    item.translation = translation
+                }
+
+                this.store.update()
             }
         }
     }
