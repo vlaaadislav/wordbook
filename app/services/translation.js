@@ -12,13 +12,14 @@ export default class TranslationService {
         this.loading = true
 
         try {
-            const response = await fetch(`${this.url}?q=${word}`)
+            const response = await fetch(`${this.url}?q=${encodeURIComponent(word)}`)
             const data = await response.json()
             this.loading = false
             return TranslationService.formatResponse(data)
         } catch (e) {
             this.error = e
             this.loading = false
+            alert(e.message)
         }
     }
 

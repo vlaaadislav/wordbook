@@ -114,6 +114,10 @@
 
                 const item = await this.translate.fetch(text)
 
+                if (this.translate.error) {
+                    return
+                }
+
                 if (this.store.wordsSet.has(item.source)) {
                     return alert('Такое слово уже есть')
                 }
