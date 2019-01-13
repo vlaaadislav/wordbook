@@ -1,8 +1,11 @@
-// https://script.google.com/macros/s/AKfycbz9WT8dWMRdbOpbwk78FSzB_g1Kvw-EDYYaP8P1alrCbF0p9NY/exec
+const DICT = 'https://dictionary.yandex.net/api/v1/dicservice.json/lookup'
+const DICT_KEY = 'dict.1.1.20190113T173518Z.6b5f6fc6886f7a00.04b3ef123e6617a253f041967b509d7e6d352ba9'
+
+const TRANSLATE = 'https://translate.yandex.net/api/v1.5/tr.json/translate'
+const TRANSLATE_KEY = 'trnsl.1.1.20190113T172305Z.c4f9164143be1338.970bea30a1fd7e8bfd561e1e7acba2073898b198'
 
 export default class TranslationService {
     constructor() {
-        this.url = 'https://script.google.com/macros/s/AKfycbz9WT8dWMRdbOpbwk78FSzB_g1Kvw-EDYYaP8P1alrCbF0p9NY/exec'
         this.loading = false
         this.error = null
     }
@@ -12,10 +15,14 @@ export default class TranslationService {
         this.loading = true
 
         try {
-            const response = await fetch(`${this.url}?q=${encodeURIComponent(word)}`)
+            const url = word.split(' ').length === 1
+                ? `${DICT}?key=${DICT_KEY}`
+                : `${TRANSLATE}?key=${TRANSLATE_KEY}`
+
+            const response = await fetch(`${url}&lang=en-ru&text=${encodeURIComponent(word)}`)
             const data = await response.json()
             this.loading = false
-            return TranslationService.formatResponse(data)
+            return TranslationService.formatResponse(word, data)
         } catch (e) {
             this.error = e
             this.loading = false
@@ -23,24 +30,19 @@ export default class TranslationService {
         }
     }
 
-    static formatResponse(data) {
-        const source = data[0][0][1]
-        const translation = data[0][0][0]
-        const options = (data[1] || []).reduce((acc, item) => (acc.push(...item[1]), acc), [])
-        const definitions = (data[12] || []).map(words => ({
-            class: words[0],
-            definitions: words[1].map(definition => definition[0])
-        }))
-
-        if (!options.includes(translation)) {
-            options.unshift(translation)
-        }
+    static formatResponse(source, data) {
+        const options = data.def
+            ? data.def.reduce((acc, item) => {
+                    acc.push(...item.tr.map(tr => tr.text))
+                    return acc
+                }, [])
+            : data.text
 
         return {
-            source: source.slice(0, 1).toUpperCase() + source.slice(1),
-            translation,
+            source,
+            translation: options[0],
             options,
-            definitions
+            definitions: []
         }
     }
 }
