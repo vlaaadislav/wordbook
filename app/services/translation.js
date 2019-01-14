@@ -33,14 +33,17 @@ export default class TranslationService {
     static formatResponse(source, data) {
         const options = data.def
             ? data.def.reduce((acc, item) => {
+                if (item.text.toLowerCase() === source.toLowerCase()) {
                     acc.push(...item.tr.map(tr => tr.text))
-                    return acc
-                }, [])
+                }
+
+                return acc
+            }, [])
             : data.text
 
         return {
             source,
-            translation: options[0],
+            translation: options[0] || '',
             options,
             definitions: []
         }
