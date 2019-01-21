@@ -1,10 +1,10 @@
 <template>
-    <FlexboxLayout v-show="pages" orientation="horizontal" alignItems="center">
-        <Button v-if="value !== 1" text="Prev" @tap="$emit('input', value - 1)"/>
+    <FlexboxLayout orientation="horizontal" alignItems="center">
+        <Button :visibility="value !== 1 ? 'visible' : 'collapsed'" text="Prev" @tap="$emit('input', value - 1)"/>
 
         <Label :text="`${value} из ${pages}`" color="black"/>
 
-        <Button v-if="value !== pages" text="Next" @tap="$emit('input', value + 1)"/>
+        <Button :visibility="value !== pages ? 'visible' : 'collapsed'" text="Next" @tap="$emit('input', value + 1)"/>
     </FlexboxLayout>
 </template>
 
