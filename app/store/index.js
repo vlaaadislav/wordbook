@@ -3,7 +3,7 @@ import * as AppSettings from 'tns-core-modules/application-settings'
 export default class Store {
     constructor() {
         this.initialized = false
-        this.data = []
+        this.data = Array.from({ length: 100 }, (_, index) => ({ source: 'Translation' + index, translation: 'Перевод' }))
         this.init()
     }
 
@@ -13,9 +13,9 @@ export default class Store {
 
     init() {
         if (!AppSettings.hasKey('data')) {
-            this.update()
+            // this.update()
         } else {
-            this.data = JSON.parse(AppSettings.getString('data'))
+            // this.data = JSON.parse(AppSettings.getString('data'))
         }
 
         this.initialized = true

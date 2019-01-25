@@ -24,7 +24,7 @@
 
         <DockLayout>
             <FlexboxLayout dock="bottom" height="40" justifyContent="center" alignItems="center">
-                <Pagination v-model="page" :total="store.data.length" :perPage="perPage"/>
+                <Pagination v-model="page" :total="store.data.length" :perPage="perPage" @input="savePage"/>
             </FlexboxLayout>
 
             <GridLayout>
@@ -64,6 +64,7 @@
     import Store from '../store/index'
     import TranslationService from '../services/translation'
     import Pagination from './Pagination'
+    import * as AppSettings from 'tns-core-modules/application-settings'
 
     export default {
         name: 'App',
@@ -77,7 +78,7 @@
                 store: new Store(),
                 translate: new TranslationService(),
                 showTranslation: true,
-                page: 1,
+                page: AppSettings.getNumber('page') || 1,
                 perPage: 15
             }
         },
@@ -112,6 +113,10 @@
                     return alert('Введите слово')
                 }
 
+                return this.fetchTranslation(text)
+            },
+
+            async fetchTranslation(text) {
                 const item = await this.translate.fetch(text)
 
                 if (this.translate.error) {
@@ -120,6 +125,16 @@
 
                 if (this.store.wordsSet.has(item.source)) {
                     return alert('Такое слово уже есть')
+                }
+
+                console.log(item.options, item.synonyms)
+
+                if (item.options.length === 0 && item.synonyms.length > 0) {
+                    const newText = await action('Возможно вы имели в виду:', 'Отмена', item.synonyms)
+
+                    if (item.synonyms.includes(newText)) {
+                        return this.fetchTranslation(newText)
+                    }
                 }
 
                 this.store.push(item)
@@ -160,6 +175,10 @@
                 }
 
                 this.store.update()
+            },
+
+            savePage(page) {
+                AppSettings.setNumber('page', page)
             }
         }
     }

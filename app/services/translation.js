@@ -19,7 +19,7 @@ export default class TranslationService {
                 ? `${DICT}?key=${DICT_KEY}`
                 : `${TRANSLATE}?key=${TRANSLATE_KEY}`
 
-            const response = await fetch(`${url}&lang=en-ru&text=${encodeURIComponent(word)}`)
+            const response = await fetch(`${url}&lang=en-ru&flags=15&text=${encodeURIComponent(word)}`)
             const data = await response.json()
             this.loading = false
             return TranslationService.formatResponse(word, data)
@@ -41,10 +41,13 @@ export default class TranslationService {
             }, [])
             : data.text
 
+        const synonyms = data.def ? [...new Set(data.def.map(item => item.text)).values()] : []
+
         return {
             source,
             translation: options[0] || '',
             options,
+            synonyms,
             definitions: []
         }
     }
