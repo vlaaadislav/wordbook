@@ -20,6 +20,20 @@
                 android.position="popup"
                 @tap="showTranslation = !showTranslation"
             />
+
+            <ActionItem
+                v-show="!showWords"
+                text="Показать слова"
+                android.position="popup"
+                @tap="showWords = !showWords"
+            />
+
+            <ActionItem
+                v-show="showWords"
+                text="Скрыть слова"
+                android.position="popup"
+                @tap="showWords = !showWords"
+            />
         </ActionBar>
 
         <DockLayout>
@@ -39,7 +53,7 @@
                     >
                         <v-template>
                             <FlexboxLayout class="list-item" justifyContent="space-between" alignItems="center">
-                                <Label :text="word.source"/>
+                                <Label :text="showWords ? word.source : ''"/>
                                 <Label :text="showTranslation ? word.translation : ''"/>
                             </FlexboxLayout>
                         </v-template>
@@ -78,6 +92,7 @@
                 store: new Store(),
                 translate: new TranslationService(),
                 showTranslation: true,
+                showWords: true,
                 page: AppSettings.getNumber('page') || 1,
                 perPage: 15
             }
