@@ -111,6 +111,9 @@
         watch: {
             showTranslation() {
                 this.$refs.list.refresh()
+            },
+            showWords() {
+                this.$refs.list.refresh()
             }
         },
 
