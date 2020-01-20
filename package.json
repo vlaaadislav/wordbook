@@ -1,6 +1,6 @@
 {
   "name": "wordbook",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A native application built with NativeScript-Vue",
   "author": "Vlad <vlaaadislav@gmail.com>",
   "license": "MIT",
